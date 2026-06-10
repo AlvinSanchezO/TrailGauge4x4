@@ -35,7 +35,64 @@ Modern card interfaces (12px radius) and sophisticated typographies create a pre
 - **Data Visualization:** `fl_chart` for dynamic sensor streams.
 - **Architecture:** Clean Architecture separation (Presentation, Domain, and Data layers). 
 
-### 🧠 Data Flow Architecture
+### 🏛️ Global System Architecture
+The application follows a strict Clean Architecture pattern, segregating hardware interactions from business logic and UI states using Riverpod for dependency injection and reactive state management.
+
+```mermaid
+graph TD
+    subgraph Data Layer
+        GPS[GPS/Location API] -.-> TelemetryRepo(TelemetryRepositoryImpl)
+        IMU[Gyro & Accelerometer] -.-> ClinometerRepo(ClinometerRepositoryImpl)
+        Prefs[Local Storage] -.-> SettingsRepo(SettingsRepositoryImpl)
+    end
+
+    subgraph Domain Layer
+        TelemetryRepo --> GeoEntity{GeoCoordinates}
+        ClinometerRepo --> AttEntity{VehicleAttitude}
+        SettingsRepo --> SettingsEntity{Limits & Algorithms}
+    end
+
+    subgraph Presentation Layer [Riverpod State Management]
+        GeoEntity --> TelemetryProv[Telemetry Providers]
+        AttEntity --> ClinometerProv[Clinometer Providers]
+        SettingsEntity --> SettingsProv[Settings Providers]
+        
+        SettingsProv -.->|Dynamic Modifiers| ClinometerProv
+    end
+
+    subgraph User Interface
+        TelemetryProv --> TelemetryUI[Telemetry Screen]
+        ClinometerProv --> ClinometerUI[Clinometer Screen]
+        SettingsProv --> SettingsUI[Settings Screen]
+        
+        TelemetryUI --- Nav(Bottom Navigation)
+        ClinometerUI --- Nav
+        SettingsUI --- Nav
+    end
+    
+    style GPS fill:#090A0C,stroke:#64748B,color:#FFFFFF
+    style IMU fill:#090A0C,stroke:#64748B,color:#FFFFFF
+    style Prefs fill:#090A0C,stroke:#64748B,color:#FFFFFF
+    
+    style TelemetryRepo fill:#14171C,stroke:#C5A059,color:#C5A059
+    style ClinometerRepo fill:#14171C,stroke:#C5A059,color:#C5A059
+    style SettingsRepo fill:#14171C,stroke:#C5A059,color:#C5A059
+    
+    style GeoEntity fill:#090A0C,stroke:#C5A059,color:#FFFFFF
+    style AttEntity fill:#090A0C,stroke:#C5A059,color:#FFFFFF
+    style SettingsEntity fill:#090A0C,stroke:#C5A059,color:#FFFFFF
+    
+    style TelemetryProv fill:#C5A059,stroke:#090A0C,color:#090A0C
+    style ClinometerProv fill:#C5A059,stroke:#090A0C,color:#090A0C
+    style SettingsProv fill:#C5A059,stroke:#090A0C,color:#090A0C
+    
+    style TelemetryUI fill:#14171C,stroke:#64748B,color:#FFFFFF
+    style ClinometerUI fill:#14171C,stroke:#64748B,color:#FFFFFF
+    style SettingsUI fill:#14171C,stroke:#64748B,color:#FFFFFF
+    style Nav fill:#090A0C,stroke:#C5A059,color:#C5A059
+```
+
+### 🧠 Telemetry Data Flow
 The following diagram illustrates how real-time GPS telemetry is processed through Riverpod to create the dynamic elevation profile:
 
 ```mermaid
