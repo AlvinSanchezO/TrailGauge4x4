@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'telemetry_providers.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -9,6 +10,7 @@ class TelemetryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locationAsync = ref.watch(locationStreamProvider);
+    final elevationHistory = ref.watch(elevationHistoryProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -118,7 +120,7 @@ class TelemetryScreen extends ConsumerWidget {
               
               const SizedBox(height: 24),
 
-              // Gráfico Perfil de Elevación Placeholder
+              // Gráfico Perfil de Elevación
               Text('[GRÁFICO - PERFIL DE ELEVACIÓN DE RUTA]', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.tertiary)),
               const SizedBox(height: 8),
               Container(
@@ -129,27 +131,71 @@ class TelemetryScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: theme.colorScheme.tertiary, width: 1),
                 ),
-                child: Stack(
-                  children: [
-                    CustomPaint(size: const Size(double.infinity, 150), painter: _CrossPainter(color: theme.colorScheme.tertiary)),
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: theme.cardColor,
-                          borderRadius: BorderRadius.circular(8),
+                padding: const EdgeInsets.only(right: 16, left: 0, top: 16, bottom: 8),
+                child: elevationHistory.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Cargando datos topográficos...',
+                          style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10),
                         ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('ELEVATION DATA STREAM', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 12)),
-                            Text('Real-time topographic mapping', style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10)),
+                      )
+                    : LineChart(
+                        LineChartData(
+                          minX: 0,
+                          maxX: 24, // 25 valores en el historial como máximo
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: false,
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                color: theme.colorScheme.tertiary.withOpacity(0.2),
+                                strokeWidth: 1,
+                              );
+                            },
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                getTitlesWidget: (value, meta) {
+                                  return Text(
+                                    value.toInt().toString(),
+                                    style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10),
+                                    textAlign: TextAlign.right,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          borderData: FlBorderData(show: false),
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: elevationHistory.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+                              isCurved: true,
+                              color: theme.colorScheme.primary,
+                              barWidth: 2.5,
+                              isStrokeCapRound: true,
+                              dotData: const FlDotData(show: false),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    theme.colorScheme.primary.withOpacity(0.3),
+                                    Colors.transparent,
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    )
-                  ],
-                ),
               )
             ],
           ),
@@ -184,20 +230,4 @@ class TelemetryScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-class _CrossPainter extends CustomPainter {
-  final Color color;
-  _CrossPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.0;
-    canvas.drawLine(const Offset(0, 0), Offset(size.width, size.height), paint);
-    canvas.drawLine(Offset(0, size.height), Offset(size.width, 0), paint);
-  }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
