@@ -36,8 +36,12 @@ Cada "Feature" (módulo) se dividirá estrictamente en tres capas:
 El código fuente dentro de `lib/` seguirá la siguiente jerarquía para reflejar el flujo de navegación descentralizado (Clinómetro, Telemetría y Configuración)[cite: 2]:
 
 ```text
-lib/
-├── main.dart
+.
+├── assets/
+│   └── images/                         # Recursos gráficos (logos, iconos nativos)
+│
+├── lib/
+│   ├── main.dart
 ├── core/                               # Utilidades y configuraciones globales
 │   ├── errors/                         # Clases para manejo de excepciones (ej. GPS sin señal)
 │   ├── theme/                          # UI táctica, colores de alto contraste y tipografía
