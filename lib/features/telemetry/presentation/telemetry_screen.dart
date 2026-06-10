@@ -9,20 +9,21 @@ class TelemetryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locationAsync = ref.watch(locationStreamProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.change_history, size: 24, color: AppTheme.primaryNavy),
+            Icon(Icons.change_history, size: 24, color: theme.colorScheme.primary),
             const SizedBox(width: 8),
-            const Text('TRAILGAUGE 4X4', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+            Text('TRAILGAUGE 4X4', style: theme.appBarTheme.titleTextStyle),
           ],
         ),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.satellite_alt, color: AppTheme.primaryNavy, size: 20),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.satellite_alt, color: theme.colorScheme.primary, size: 20),
           )
         ],
       ),
@@ -32,12 +33,12 @@ class TelemetryScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('TELEMETRÍA Y\nCOORDENADAS', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.primaryNavy, height: 1.2)),
+              Text('TELEMETRÍA Y\nCOORDENADAS', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: theme.colorScheme.primary, height: 1.2)),
               const SizedBox(height: 4),
-              const Text('Sincronización en tiempo real vía satélite', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Sincronización en tiempo real vía satélite', style: TextStyle(fontSize: 12, color: theme.colorScheme.tertiary)),
               const SizedBox(height: 24),
 
-              // Tarjeta Velocidad (Como pide el Wireframe, se deja placeholder fijo por ahora)
+              // Tarjeta Velocidad
               _buildLightCard(
                 context,
                 title: 'VELOCIDAD ACTUAL',
@@ -45,11 +46,11 @@ class TelemetryScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(coords.speedKmh.toStringAsFixed(0), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppTheme.primaryNavy)),
+                    Text(coords.speedKmh.toStringAsFixed(0), style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: theme.colorScheme.primary)),
                     const SizedBox(width: 4),
-                    const Text('km/h', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryNavy)),
+                    Text('km/h', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.colorScheme.primary)),
                     const Spacer(),
-                    const Icon(Icons.speed, color: AppTheme.primaryNavy),
+                    Icon(Icons.speed, color: theme.colorScheme.primary),
                   ],
                 ),
               ),
@@ -63,11 +64,11 @@ class TelemetryScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(coords.altitudeMeters.toStringAsFixed(0), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppTheme.primaryNavy)),
+                    Text(coords.altitudeMeters.toStringAsFixed(0), style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: theme.colorScheme.primary)),
                     const SizedBox(width: 4),
-                    const Text('msnm', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryNavy)),
+                    Text('msnm', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.colorScheme.primary)),
                     const Spacer(),
-                    const Icon(Icons.terrain, color: AppTheme.primaryNavy),
+                    Icon(Icons.terrain, color: theme.colorScheme.primary),
                   ],
                 ),
               ),
@@ -77,7 +78,7 @@ class TelemetryScreen extends ConsumerWidget {
               _buildLightCard(
                 context,
                 title: 'COORDENADAS DECIMALES',
-                content: Text(coords.decimalFormat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryNavy, height: 1.5)),
+                content: Text(coords.decimalFormat, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.colorScheme.primary, height: 1.5)),
                 icon: Icons.location_on_outlined,
               ),
               const SizedBox(height: 12),
@@ -85,26 +86,29 @@ class TelemetryScreen extends ConsumerWidget {
               // Tarjeta Dark Mode (Transmisión de Rescate DMS)
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(color: AppTheme.primaryNavy), // Sin bordes redondeados según Wireframe
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
-                        Icon(Icons.security, color: Colors.grey, size: 16),
-                        SizedBox(width: 8),
-                        Text('TRANSMISIÓN DE RESCATE (DMS)', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                      children: [
+                        Icon(Icons.security, color: theme.colorScheme.tertiary, size: 16),
+                        const SizedBox(width: 8),
+                        Text('TRANSMISIÓN DE RESCATE (DMS)', style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(coords.dmsFormat, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
+                    Text(coords.dmsFormat, style: TextStyle(color: theme.colorScheme.primary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
                     const SizedBox(height: 24),
-                    const Divider(color: Colors.white24, height: 1),
+                    Divider(color: theme.colorScheme.tertiary.withOpacity(0.5), height: 1),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('PROTOCOLO ACTIVO', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                        Text('PROTOCOLO ACTIVO', style: TextStyle(color: theme.colorScheme.primary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                         Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppTheme.dangerState, shape: BoxShape.circle)),
                       ],
                     )
@@ -114,28 +118,32 @@ class TelemetryScreen extends ConsumerWidget {
               
               const SizedBox(height: 24),
 
-              // Gráfico Perfil de Elevación Placeholder (Wireframe Box con Cruz)
-              const Text('[GRÁFICO - PERFIL DE ELEVACIÓN DE RUTA]', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy)),
+              // Gráfico Perfil de Elevación Placeholder
+              Text('[GRÁFICO - PERFIL DE ELEVACIÓN DE RUTA]', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.tertiary)),
               const SizedBox(height: 8),
               Container(
                 height: 150,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppTheme.background,
-                  border: Border.all(color: AppTheme.primaryNavy, width: 1),
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.colorScheme.tertiary, width: 1),
                 ),
                 child: Stack(
                   children: [
-                    CustomPaint(size: const Size(double.infinity, 150), painter: _CrossPainter()),
+                    CustomPaint(size: const Size(double.infinity, 150), painter: _CrossPainter(color: theme.colorScheme.tertiary)),
                     Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text('ELEVATION DATA STREAM', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryNavy, fontSize: 12)),
-                            Text('Real-time topographic mapping', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                          children: [
+                            Text('ELEVATION DATA STREAM', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 12)),
+                            Text('Real-time topographic mapping', style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10)),
                           ],
                         ),
                       ),
@@ -146,23 +154,28 @@ class TelemetryScreen extends ConsumerWidget {
             ],
           ),
         ),
-        loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.primaryNavy)),
+        loading: () => Center(child: CircularProgressIndicator(color: theme.colorScheme.primary)),
         error: (err, stack) => Center(child: Text('Error GPS:\n$err', textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.dangerState))),
       ),
     );
   }
 
   Widget _buildLightCard(BuildContext context, {required String title, required Widget content, IconData? icon}) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppTheme.borderGray, width: 1.5)),
+      decoration: BoxDecoration(
+        color: theme.cardColor, 
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.tertiary, width: 1.5),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              if (icon != null) ...[Icon(icon, color: Colors.grey, size: 16), const SizedBox(width: 8)],
-              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+              if (icon != null) ...[Icon(icon, color: theme.colorScheme.tertiary, size: 16), const SizedBox(width: 8)],
+              Text(title, style: TextStyle(color: theme.colorScheme.tertiary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
             ],
           ),
           const SizedBox(height: 12),
@@ -174,10 +187,13 @@ class TelemetryScreen extends ConsumerWidget {
 }
 
 class _CrossPainter extends CustomPainter {
+  final Color color;
+  _CrossPainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppTheme.primaryNavy
+      ..color = color
       ..strokeWidth = 1.0;
     canvas.drawLine(const Offset(0, 0), Offset(size.width, size.height), paint);
     canvas.drawLine(Offset(0, size.height), Offset(size.width, 0), paint);

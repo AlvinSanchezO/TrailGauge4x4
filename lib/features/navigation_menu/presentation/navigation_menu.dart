@@ -34,9 +34,9 @@ class _NavigationMenuState extends State<NavigationMenu> {
             _currentIndex = index;
           });
         },
-        backgroundColor: Theme.of(context).primaryColor,
-        selectedItemColor: Theme.of(context).colorScheme.primary, // Verde seguro
-        unselectedItemColor: Colors.grey,
+        backgroundColor: Theme.of(context).cardColor,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.tertiary,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
